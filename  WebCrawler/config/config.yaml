@@ -1,0 +1,6 @@
+UrlList:
+  - https://www.investing.com/
+    
+Elastic:
+  Uri: http://el:8200
+  IndexName: ofjo
