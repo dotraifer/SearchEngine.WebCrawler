@@ -1,0 +1,40 @@
+# Ignore .git directories and files
+.git
+.gitignore
+
+# Ignore build and publish directories
+bin/
+obj/
+out/
+
+# Ignore Rider and ReSharper-specific files
+.idea/
+.idea/*
+
+# Ignore user-specific files
+.vscode/
+.vs/
+.vsconfig/
+
+# Ignore temporary files
+*.tmp
+*.swp
+*.suo
+*.user
+*.log
+
+# Ignore compiled files (e.g., DLLs, EXEs) in source code folders
+*.dll
+*.exe
+*.pdb
+
+# Ignore other unwanted files
+*.md
+*.txt
+
+# Ignore npm or other package manager directories if applicable
+node_modules/
+
+# Ignore Docker-related files (if not needed)
+Dockerfile
+docker-compose.yml
