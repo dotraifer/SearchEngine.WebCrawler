@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using ConcurrentCollections;
 using HtmlAgilityPack;
-using Nest;
 
 namespace WebCrawler;
 
@@ -34,8 +33,8 @@ public class Crawler : IHasContext, ICrawler
                 Task.Delay(1000);
                 if (scrapedPage != null)
                 {
-                    //_elasticConnector.IndexObjectAsync(scrapedPage, 
-                    //    $"{GetType().Name}-{scrapedPage.ScrapedAt}").Dispose();
+                    _elasticConnector.IndexObjectAsync(scrapedPage, 
+                        $"{GetType().Name.ToLower()}-{scrapedPage.ScrapedAt:dd-MM-yy}");
                 }
             });
         };

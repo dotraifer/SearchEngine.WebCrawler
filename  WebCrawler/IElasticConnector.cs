@@ -1,10 +1,10 @@
-using Nest;
+using OpenSearch.Client;
 
 namespace WebCrawler;
 
 public interface IElasticConnector
 {
-    IElasticClient ElasticClient { get; set; }
+    IOpenSearchClient ElasticClient { get; set; }
 
-    Task IndexObjectAsync(object obj, string indexName);
+    Task IndexObjectAsync(ScrapedPage scrapedPage, string indexName);
 }

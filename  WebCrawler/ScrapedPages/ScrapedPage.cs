@@ -1,6 +1,9 @@
+using System.Text;
+using System.Text.Json;
+
 namespace WebCrawler;
 
-public record ScrapedPage
+public class ScrapedPage
 {
     public string Url { get; set; } // The URL of the scraped page
     public string? Title { get; set; } // The title of the page
@@ -10,4 +13,19 @@ public record ScrapedPage
     public List<Link>? Links { get; set; } // List of links on the page
     public List<Image>? Images { get; set; } // List of images
     public DateTime ScrapedAt { get; set; } // The time the page was scraped
+
+    public override string ToString()
+    {
+        var jsonData = new
+        {
+            URL = Url,
+            Title = Title,
+            ScrapedAt = ScrapedAt
+        };
+
+        return JsonSerializer.Serialize(jsonData, new JsonSerializerOptions
+        {
+            WriteIndented = true,
+        });
+    }
 }

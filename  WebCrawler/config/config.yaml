@@ -1,6 +1,10 @@
 UrlList:
   - https://www.investing.com/
+  
+MaximumSearchDepth: 2
     
 Elastic:
-  Uri: http://el:8200
+  Uri: https://search-search-engine-gd5uc3ssxzg6e34idb6jyjbrb4.aos.eu-central-1.on.aws
   IndexName: ofjo
+  User: Administrator
+  Password: Dotan.0410

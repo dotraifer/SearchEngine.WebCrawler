@@ -1,5 +1,6 @@
 using Autofac;
-using Nest;
+using OpenSearch.Client;
+using OpenSearch.Net;
 
 namespace WebCrawler;
 
@@ -11,9 +12,11 @@ public class Facade(Context context) : IHasContext
     {
         var builder = new ContainerBuilder();
         var settings = new ConnectionSettings(Context.Configuration.Elastic.Uri)
-            .DefaultIndex("scraped_pages");
+            .BasicAuthentication(Context.Configuration.Elastic.User, Context.Configuration.Elastic.Password)
+            .DefaultIndex("scraped-pages");
+            
         
-        builder.RegisterInstance(new ElasticClient(settings)).As<IElasticClient>();
+        builder.RegisterInstance(new OpenSearchClient(settings)).As<IOpenSearchClient>();
         builder.RegisterType<ElasticConnector>().As<IElasticConnector>();
         builder.RegisterType<Crawler>().AsSelf();
         builder.RegisterInstance(Context).As<IContext>();
