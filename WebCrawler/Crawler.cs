@@ -116,6 +116,7 @@ public class Crawler : IHasContext, ICrawler
         }
         catch (Exception ex)
         {
+            _urlsToScrape.Enqueue(new KeyValuePair<string, int>(url, currentDepth));
             Context.Logger.Error("Error processing {Url}: {Message}", url, ex.Message);
             return null;
         }
