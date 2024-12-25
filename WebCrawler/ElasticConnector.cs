@@ -1,4 +1,5 @@
 using OpenSearch.Client;
+using WebCrawler.Context;
 
 namespace WebCrawler;
 

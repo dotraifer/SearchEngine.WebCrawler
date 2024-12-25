@@ -1,7 +1,7 @@
 using Serilog;
 using WebCrawler.ConfigurationObjects;
 
-namespace WebCrawler;
+namespace WebCrawler.Context;
 
 public class Context : IContext
 {

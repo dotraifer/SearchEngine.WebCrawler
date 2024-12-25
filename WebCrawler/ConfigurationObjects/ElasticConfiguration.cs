@@ -11,7 +11,9 @@ public record ElasticConfiguration
     [Required, Description("Elastic index")]
     public required string IndexName { get; init; }
     
+    [Description("Elastic user"), Required]
     public string? User { get; init; }
     
+    [Description("Elastic password"), Required]
     public string? Password { get; init; }
 }

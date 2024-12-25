@@ -1,4 +1,4 @@
-namespace WebCrawler;
+namespace WebCrawler.Context;
 
 public interface IHasContext
 { 

@@ -1,6 +1,6 @@
 using Serilog;
 
-namespace WebCrawler;
+namespace WebCrawler.Context;
 
 public interface IContext
 {

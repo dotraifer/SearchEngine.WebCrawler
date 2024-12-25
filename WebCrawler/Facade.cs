@@ -1,10 +1,11 @@
 using Autofac;
 using OpenSearch.Client;
 using OpenSearch.Net;
+using WebCrawler.Context;
 
 namespace WebCrawler;
 
-public class Facade(Context context) : IHasContext
+public class Facade(Context.Context context) : IHasContext
 {
     public IContext Context { get; set; } = context;
 
