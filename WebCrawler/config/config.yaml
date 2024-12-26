@@ -1,10 +1,13 @@
 UrlList:
   - https://www.investing.com/
+  - https://finance.yahoo.com/
+  - https://www.ft.com/
+  - https://www.bloomberg.com/
   
 MaximumSearchDepth: 2
     
 Elastic:
-  Uri: https://search-search-engine-gd5uc3ssxzg6e34idb6jyjbrb4.aos.eu-central-1.on.aws
-  IndexName: ofjo
-  User: Administrator
+  Uri: https://search-search-engine-domain-kct7wz4ghml2puaicruizektd4.aos.eu-central-1.on.aws
+  IndexName: scrped-pages
+  User: administrator
   Password: Dotan.0410

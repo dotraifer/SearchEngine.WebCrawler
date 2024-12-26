@@ -12,6 +12,7 @@ public class ScrapedPage
     public List<string>? Paragraphs { get; set; } // List of paragraphs
     public List<Link>? Links { get; set; } // List of links on the page
     public List<Image>? Images { get; set; } // List of images
+    public int Clicks { get; set; } = 0;
     public DateTime ScrapedAt { get; set; } // The time the page was scraped
 
     public override string ToString()

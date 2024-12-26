@@ -35,7 +35,7 @@ public class Crawler : IHasContext, ICrawler
                 if (scrapedPage != null)
                 {
                     _elasticConnector.IndexObjectAsync(scrapedPage, 
-                        $"{GetType().Name.ToLower()}-{scrapedPage.ScrapedAt:dd-MM-yy}");
+                        $"{GetType().Name.ToLower()}");
                 }
             });
         };
