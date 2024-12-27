@@ -4,6 +4,7 @@ using WebCrawler.ScrapedPages;
 
 namespace WebCrawler;
 
+
 public class ElasticConnector(IOpenSearchClient elasticClient, IContext context)
     : IElasticConnector, IHasContext
 {
@@ -16,7 +17,6 @@ public class ElasticConnector(IOpenSearchClient elasticClient, IContext context)
     public void IndexObjectAsync(IList<ScrapedPage> scrapedPages, string indexName)
     {
         Batch.AddRange(scrapedPages);
-        Console.WriteLine(Batch.Count);
         if (scrapedPages.Count == 0) return;
 
         if (Batch.Count < Context.Configuration.Elastic.BulkSize)

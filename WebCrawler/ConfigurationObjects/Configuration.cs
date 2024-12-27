@@ -4,6 +4,9 @@ using Serilog.Events;
 
 namespace WebCrawler.ConfigurationObjects;
 
+/// <summary>
+/// Root configuration object
+/// </summary>
 public record Configuration
 {
     [Required]
@@ -16,7 +19,7 @@ public record Configuration
 
     [Required]
     [Description("List of sites urls to scrape")]
-    public required List<string?> UrlList { get; init; }
+    public required List<string> UrlList { get; init; }
 
     [DefaultValue(5)]
     [Description("Number of conccurent scrape tasks")]

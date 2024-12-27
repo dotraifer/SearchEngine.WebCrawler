@@ -8,6 +8,9 @@ public class Facade(Context.Context context) : IHasContext
 {
     public IContext Context { get; set; } = context;
 
+    /// <summary>
+    /// Run the web crawler
+    /// </summary>
     public void Run()
     {
         var builder = new ContainerBuilder();
@@ -33,6 +36,6 @@ public class Facade(Context.Context context) : IHasContext
 
         var container = builder.Build();
         using var scope = container.BeginLifetimeScope();
-        _ = container.Resolve<Crawler>().CrawlAsync();
+        container.Resolve<Crawler>().CrawlUrls();
     }
 }

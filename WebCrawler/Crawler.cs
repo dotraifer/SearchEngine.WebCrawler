@@ -6,43 +6,59 @@ using WebCrawler.ScrapedPages;
 
 namespace WebCrawler;
 
+/// <summary>
+/// Represents a web crawler that processes URLs and scrapes web pages.
+/// </summary>
 public class Crawler : IHasContext, ICrawler
 {
+    /// <summary>
+    /// Gets or sets the context for the crawler.
+    /// </summary>
     public IContext Context { get; set; }
+
     private readonly IElasticConnector _elasticConnector;
     private readonly ConcurrentQueue<KeyValuePair<string, int>> _urlsToScrape = new();
     private readonly ConcurrentHashSet<string> _visitedUrls = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Crawler"/> class.
+    /// </summary>
+    /// <param name="context">The context for the crawler.</param>
+    /// <param name="elasticConnector">The elastic connector for indexing scraped pages.</param>
+    /// <param name="httpClient">The HTTP client for fetching web pages.</param>
     public Crawler(IContext context, IElasticConnector elasticConnector, HttpClient httpClient)
     {
-        _httpClient = httpClient;
+        HttpClient = httpClient;
         Context = context;
-        Context.Configuration.UrlList?.ForEach(url => _urlsToScrape?.Enqueue
-            (new KeyValuePair<string, int>(url, 0)));
+        Context.Configuration.UrlList?.ForEach(url => _urlsToScrape?.Enqueue(new KeyValuePair<string, int>(url, 0)));
         _elasticConnector = elasticConnector;
     }
 
-    private HttpClient _httpClient { get; }
+    private HttpClient HttpClient { get; }
 
-    public Task CrawlAsync()
+    /// <summary>
+    /// Crawls the URLs in the queue in parallel.
+    /// </summary>
+    public void CrawlUrls()
     {
         while (!_urlsToScrape.IsEmpty)
         {
             var pages = new ConcurrentBag<ScrapedPage>();
-            var batches = DequeueBatch
-                (Math.Min(_urlsToScrape.Count, Context.Configuration.NumberOfConcurrentTasks));
+            var batches = DequeueBatch(Math.Min(_urlsToScrape.Count, Context.Configuration.NumberOfConcurrentTasks));
             Parallel.ForEach(batches, batch =>
             {
                 var scrapedPage = ProcessUrlAsync(batch.Key, batch.Value).Result;
                 if (scrapedPage != null) pages.Add(scrapedPage);
             });
-            _elasticConnector.IndexObjectAsync(pages.ToList(),
-                $"{GetType().Name.ToLower()}");
+            _elasticConnector.IndexObjectAsync(pages.ToList(), $"{GetType().Name.ToLower()}");
         }
-
-        return Task.CompletedTask;
     }
-    
+
+    /// <summary>
+    /// Dequeues a batch of URLs from the queue.
+    /// </summary>
+    /// <param name="batchSize">The size of the batch to dequeue.</param>
+    /// <returns>A collection of URL and depth pairs.</returns>
     private IEnumerable<KeyValuePair<string, int>> DequeueBatch(int batchSize)
     {
         var batch = new List<KeyValuePair<string, int>>();
@@ -50,19 +66,23 @@ public class Crawler : IHasContext, ICrawler
         return batch;
     }
 
-
+    /// <summary>
+    /// Processes a URL asynchronously.
+    /// </summary>
+    /// <param name="url">The URL to process.</param>
+    /// <param name="currentDepth">The current depth of the URL in the crawl.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the scraped page or null if the URL was already visited.</returns>
     private async Task<ScrapedPage?> ProcessUrlAsync(string url, int currentDepth)
     {
         if (!_visitedUrls.Add(url)) return null; // Skip if already visited
         try
         {
             // Fetch the content of the URL
-            var content = await _httpClient.GetStringAsync(url);
+            var content = await HttpClient.GetStringAsync(url);
             Context.Logger.Information("Processing {Url}", url);
             // Extract links from the content
             var links = ExtractLinks(url, content);
 
-            // Enqueue new links for crawling
             // Enqueue new links for crawling if within the depth limit
             if (currentDepth + 1 <= Context.Configuration.MaximumSearchDepth)
                 foreach (var link in links.Where(link => !_visitedUrls.Contains(link.Url)))
@@ -93,7 +113,6 @@ public class Crawler : IHasContext, ICrawler
                 })
                 .ToList() ?? new List<Image>();
 
-
             return new ScrapedPage
             {
                 Url = url,
@@ -114,6 +133,12 @@ public class Crawler : IHasContext, ICrawler
         }
     }
 
+    /// <summary>
+    /// Extracts links from the HTML content of a page.
+    /// </summary>
+    /// <param name="baseUrl">The base URL of the page.</param>
+    /// <param name="htmlContent">The HTML content of the page.</param>
+    /// <returns>A list of links extracted from the page.</returns>
     private static List<Link> ExtractLinks(string baseUrl, string htmlContent)
     {
         var links = new List<Link>();

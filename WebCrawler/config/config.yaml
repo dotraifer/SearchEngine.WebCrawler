@@ -28,4 +28,4 @@ Elastic:
   IndexName: scrped-pages
   User: administrator
   Password: Dotan.0410
-  BulkSize: 20
+  BulkSize: 10

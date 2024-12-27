@@ -3,6 +3,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace WebCrawler.ConfigurationObjects;
 
+/// <summary>
+/// Elastic search configurations
+/// </summary>
 public record ElasticConfiguration
 {
     [Required]
@@ -23,6 +26,6 @@ public record ElasticConfiguration
     public string? Password { get; init; }
 
     [Description("Bulk size")]
-    
+    [DefaultValue(10)]
     public int BulkSize { get; init; } = 10;
 }
