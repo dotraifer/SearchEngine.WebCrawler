@@ -14,7 +14,7 @@ public record Configuration
     public required List<string?> UrlList { get; init; }
 
     [DefaultValue(5) ,Description("Number of conccurent scrape tasks")]
-    public int NumberOfConcurrentTasks { get; init; } = 5;
+    public int NumberOfConcurrentTasks { get; init; } = 20;
 
     [DefaultValue(5), Description("Maximum url search depth")]
     public int MaximumSearchDepth { get; init; } = 5;

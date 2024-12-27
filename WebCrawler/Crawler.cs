@@ -9,36 +9,42 @@ public class Crawler : IHasContext, ICrawler
 {
     public IContext Context { get; set; }
     private readonly ConcurrentQueue<KeyValuePair<string, int>> _urlsToScrape = new();
-    private readonly HttpClient _httpClient = new();
+    private HttpClient _httpClient { get; set; }
     private readonly ConcurrentHashSet<string> _visitedUrls = new(StringComparer.OrdinalIgnoreCase);
     private readonly IElasticConnector _elasticConnector;
 
-    public Crawler(IContext context,  IElasticConnector elasticConnector)
+    public Crawler(IContext context,  IElasticConnector elasticConnector, HttpClient httpClient)
     {
+        _httpClient = httpClient;
         Context = context;
         Context.Configuration.UrlList?.ForEach(url => _urlsToScrape?.Enqueue
             (new KeyValuePair<string, int>(url, 0)));
         _elasticConnector = elasticConnector;
     }
 
-    public async Task CrawlAsync()
+    public Task CrawlAsync()
     {
         while (!_urlsToScrape.IsEmpty)
         {
+            var pages = new ConcurrentBag<ScrapedPage>();
             var batches = DequeueBatch
                 (Math.Min(_urlsToScrape.Count, Context.Configuration.NumberOfConcurrentTasks));
-
             Parallel.ForEach(batches, batch =>
             {
                 var scrapedPage = ProcessUrlAsync(batch.Key, batch.Value).Result;
-                Task.Delay(1000);
                 if (scrapedPage != null)
                 {
-                    _elasticConnector.IndexObjectAsync(scrapedPage, 
-                        $"{GetType().Name.ToLower()}");
+                    pages.Add(scrapedPage);
                 }
+                // else
+                // {
+                //     _urlsToScrape.Enqueue(new KeyValuePair<string, int>(batch.Key, batch.Value));
+                // }
             });
-        };
+            _elasticConnector.IndexObjectAsync(pages.ToList(), 
+                $"{GetType().Name.ToLower()}");
+        }
+        return Task.CompletedTask;
     }
     
     private IEnumerable<KeyValuePair<string, int>> DequeueBatch(int batchSize)
@@ -62,6 +68,7 @@ public class Crawler : IHasContext, ICrawler
         {
             // Fetch the content of the URL
             var content = await _httpClient.GetStringAsync(url);
+            Context.Logger.Information("Processing {Url}", url);
             // Extract links from the content
             var links = ExtractLinks(url, content);
 
@@ -138,7 +145,7 @@ public class Crawler : IHasContext, ICrawler
                 if (!string.IsNullOrEmpty(href))
                 {
                     // Convert relative URLs to absolute URLs
-                    Uri baseUri = new Uri(baseUrl);
+                    var baseUri = new Uri(baseUrl);
                     Uri fullUri;
                     if (Uri.TryCreate(baseUri, href, out fullUri))
                     {

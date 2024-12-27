@@ -6,5 +6,5 @@ public interface IElasticConnector
 {
     IOpenSearchClient ElasticClient { get; set; }
 
-    Task IndexObjectAsync(ScrapedPage scrapedPage, string indexName);
+    Task IndexObjectAsync(IList<ScrapedPage> scrapedPages, string indexName);
 }

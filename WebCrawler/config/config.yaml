@@ -1,10 +1,10 @@
 UrlList:
   - https://www.investing.com/
   - https://finance.yahoo.com/
-  - https://www.ft.com/
   - https://www.bloomberg.com/
   
 MaximumSearchDepth: 2
+NumberOfConcurrentTasks: 20
     
 Elastic:
   Uri: https://search-search-engine-domain-kct7wz4ghml2puaicruizektd4.aos.eu-central-1.on.aws
