@@ -1,4 +1,3 @@
-using WebCrawler.ConfigurationObjects;
 using YamlDotNet.Serialization;
 
 namespace WebCrawler;

@@ -2,12 +2,30 @@ UrlList:
   - https://www.investing.com/
   - https://finance.yahoo.com/
   - https://www.bloomberg.com/
-  
-MaximumSearchDepth: 2
+  - https://www.cnbc.com
+  - https://www.reuters.com
+  - https://www.marketwatch.com
+  - https://www.wsj.com
+  - https://www.forbes.com
+  - https://www.fool.com
+  - https://www.morningstar.com
+  - https://www.nasdaq.com
+  - https://www.entrepreneur.com
+  - https://www.theinvestorsagency.com
+  - https://www.schwab.com
+  - https://www.americanfunds.com
+  - https://www.vanguard.com
+  - https://www.hedgeweek.com
+  - https://www.barrons.com
+  - https://www.financialtimes.com
+  - https://www.sec.gov
+
+MaximumSearchDepth: 3
 NumberOfConcurrentTasks: 20
-    
+
 Elastic:
   Uri: https://search-search-engine-domain-kct7wz4ghml2puaicruizektd4.aos.eu-central-1.on.aws
   IndexName: scrped-pages
   User: administrator
   Password: Dotan.0410
+  BulkSize: 20

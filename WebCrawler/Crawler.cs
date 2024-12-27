@@ -2,18 +2,18 @@ using System.Collections.Concurrent;
 using ConcurrentCollections;
 using HtmlAgilityPack;
 using WebCrawler.Context;
+using WebCrawler.ScrapedPages;
 
 namespace WebCrawler;
 
 public class Crawler : IHasContext, ICrawler
 {
     public IContext Context { get; set; }
-    private readonly ConcurrentQueue<KeyValuePair<string, int>> _urlsToScrape = new();
-    private HttpClient _httpClient { get; set; }
-    private readonly ConcurrentHashSet<string> _visitedUrls = new(StringComparer.OrdinalIgnoreCase);
     private readonly IElasticConnector _elasticConnector;
+    private readonly ConcurrentQueue<KeyValuePair<string, int>> _urlsToScrape = new();
+    private readonly ConcurrentHashSet<string> _visitedUrls = new(StringComparer.OrdinalIgnoreCase);
 
-    public Crawler(IContext context,  IElasticConnector elasticConnector, HttpClient httpClient)
+    public Crawler(IContext context, IElasticConnector elasticConnector, HttpClient httpClient)
     {
         _httpClient = httpClient;
         Context = context;
@@ -21,6 +21,8 @@ public class Crawler : IHasContext, ICrawler
             (new KeyValuePair<string, int>(url, 0)));
         _elasticConnector = elasticConnector;
     }
+
+    private HttpClient _httpClient { get; }
 
     public Task CrawlAsync()
     {
@@ -32,38 +34,26 @@ public class Crawler : IHasContext, ICrawler
             Parallel.ForEach(batches, batch =>
             {
                 var scrapedPage = ProcessUrlAsync(batch.Key, batch.Value).Result;
-                if (scrapedPage != null)
-                {
-                    pages.Add(scrapedPage);
-                }
-                // else
-                // {
-                //     _urlsToScrape.Enqueue(new KeyValuePair<string, int>(batch.Key, batch.Value));
-                // }
+                if (scrapedPage != null) pages.Add(scrapedPage);
             });
-            _elasticConnector.IndexObjectAsync(pages.ToList(), 
+            _elasticConnector.IndexObjectAsync(pages.ToList(),
                 $"{GetType().Name.ToLower()}");
         }
+
         return Task.CompletedTask;
     }
     
     private IEnumerable<KeyValuePair<string, int>> DequeueBatch(int batchSize)
     {
         var batch = new List<KeyValuePair<string, int>>();
-        while (batch.Count < batchSize && _urlsToScrape.TryDequeue(out var pair))
-        {
-            batch.Add(pair);
-        }
+        while (batch.Count < batchSize && _urlsToScrape.TryDequeue(out var pair)) batch.Add(pair);
         return batch;
     }
-    
-    
+
+
     private async Task<ScrapedPage?> ProcessUrlAsync(string url, int currentDepth)
     {
-        if (!_visitedUrls.Add(url))
-        {
-            return null; // Skip if already visited
-        }
+        if (!_visitedUrls.Add(url)) return null; // Skip if already visited
         try
         {
             // Fetch the content of the URL
@@ -75,16 +65,10 @@ public class Crawler : IHasContext, ICrawler
             // Enqueue new links for crawling
             // Enqueue new links for crawling if within the depth limit
             if (currentDepth + 1 <= Context.Configuration.MaximumSearchDepth)
-            {
                 foreach (var link in links.Where(link => !_visitedUrls.Contains(link.Url)))
-                {
-                    _urlsToScrape.Enqueue(new KeyValuePair<string, int>(link.Url, currentDepth+1));
-                }
-            }
+                    _urlsToScrape.Enqueue(new KeyValuePair<string, int>(link.Url, currentDepth + 1));
             else
-            {
                 Context.Logger.Information("Max depth {Depth} reached for {Url}", currentDepth, url);
-            }
 
             // Parse and create a ScrapedPage object
             var htmlDoc = new HtmlDocument();
@@ -108,8 +92,8 @@ public class Crawler : IHasContext, ICrawler
                     AltText = node.GetAttributeValue("alt", string.Empty)
                 })
                 .ToList() ?? new List<Image>();
-            
-            
+
+
             return new ScrapedPage
             {
                 Url = url,
@@ -129,7 +113,7 @@ public class Crawler : IHasContext, ICrawler
             return null;
         }
     }
-    
+
     private static List<Link> ExtractLinks(string baseUrl, string htmlContent)
     {
         var links = new List<Link>();
@@ -138,7 +122,6 @@ public class Crawler : IHasContext, ICrawler
 
         var nodes = htmlDoc.DocumentNode.SelectNodes("//a[@href]");
         if (nodes != null)
-        {
             foreach (var node in nodes)
             {
                 var href = node.GetAttributeValue("href", string.Empty);
@@ -148,17 +131,14 @@ public class Crawler : IHasContext, ICrawler
                     var baseUri = new Uri(baseUrl);
                     Uri fullUri;
                     if (Uri.TryCreate(baseUri, href, out fullUri))
-                    {
                         links.Add(new Link
                         {
                             Text = node.Name,
                             Url = fullUri.ToString()
                         });
-                    }
                 }
             }
-        }
-        
+
         return links;
     }
 }

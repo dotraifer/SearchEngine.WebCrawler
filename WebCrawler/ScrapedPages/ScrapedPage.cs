@@ -1,11 +1,10 @@
-using System.Text;
 using System.Text.Json;
 
-namespace WebCrawler;
+namespace WebCrawler.ScrapedPages;
 
 public class ScrapedPage
 {
-    public string Url { get; set; } // The URL of the scraped page
+    public required string Url { get; set; } // The URL of the scraped page
     public string? Title { get; set; } // The title of the page
     public string? HtmlContent { get; set; } // The raw HTML content
     public List<string>? Headings { get; set; } // List of headings (H1, H2, etc.)
@@ -20,13 +19,13 @@ public class ScrapedPage
         var jsonData = new
         {
             URL = Url,
-            Title = Title,
-            ScrapedAt = ScrapedAt
+            Title,
+            ScrapedAt
         };
 
         return JsonSerializer.Serialize(jsonData, new JsonSerializerOptions
         {
-            WriteIndented = true,
+            WriteIndented = true
         });
     }
 }

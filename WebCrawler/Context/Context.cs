@@ -17,7 +17,7 @@ public class Context : IContext
     }
 
     public Configuration Configuration { set; get; }
-    
+
     public ILogger Logger { get; set; }
 
 
@@ -26,6 +26,4 @@ public class Context : IContext
         var yaml = File.ReadAllText(yamlFilePath);
         return YamlParser.Parse<Configuration>(yaml);
     }
-    
-    
 }

@@ -1,12 +1,11 @@
 using Serilog;
+using WebCrawler.ConfigurationObjects;
 
 namespace WebCrawler.Context;
 
 public interface IContext
 {
-    ConfigurationObjects.Configuration Configuration { get; set; }
-    
+    Configuration Configuration { get; set; }
+
     ILogger Logger { get; set; }
-    
-    
 }

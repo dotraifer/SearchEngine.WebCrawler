@@ -1,4 +1,4 @@
-namespace WebCrawler;
+namespace WebCrawler.ScrapedPages;
 
 public record Link
 {
