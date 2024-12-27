@@ -2,6 +2,7 @@ using System.Collections.Concurrent;
 using ConcurrentCollections;
 using HtmlAgilityPack;
 using WebCrawler.Context;
+using WebCrawler.HttpAbstractions;
 using WebCrawler.ScrapedPages;
 
 namespace WebCrawler;
@@ -26,7 +27,7 @@ public class Crawler : IHasContext, ICrawler
     /// <param name="context">The context for the crawler.</param>
     /// <param name="elasticConnector">The elastic connector for indexing scraped pages.</param>
     /// <param name="httpClient">The HTTP client for fetching web pages.</param>
-    public Crawler(IContext context, IElasticConnector elasticConnector, HttpClient httpClient)
+    public Crawler(IContext context, IElasticConnector elasticConnector, IHttpClient httpClient)
     {
         HttpClient = httpClient;
         Context = context;
@@ -34,7 +35,7 @@ public class Crawler : IHasContext, ICrawler
         _elasticConnector = elasticConnector;
     }
 
-    private HttpClient HttpClient { get; }
+    private IHttpClient HttpClient { get; }
 
     /// <summary>
     /// Crawls the URLs in the queue in parallel.

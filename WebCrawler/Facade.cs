@@ -1,6 +1,7 @@
 using Autofac;
 using OpenSearch.Client;
 using WebCrawler.Context;
+using WebCrawler.HttpAbstractions;
 
 namespace WebCrawler;
 
@@ -28,7 +29,7 @@ public class Facade(Context.Context context) : IHasContext
         httpClient.DefaultRequestHeaders.Add("Accept-Charset", "UTF-8");
         httpClient.DefaultRequestHeaders.Add("Accept-Language", "en-US,en;q=0.9");
 
-        builder.RegisterInstance(httpClient).As<HttpClient>().SingleInstance();
+        builder.RegisterInstance(new HttpClientWrapper(httpClient)).As<IHttpClient>().SingleInstance();
         builder.RegisterInstance(new OpenSearchClient(settings)).As<IOpenSearchClient>().SingleInstance();
         builder.RegisterType<ElasticConnector>().As<IElasticConnector>().SingleInstance();
         builder.RegisterType<Crawler>().AsSelf();
