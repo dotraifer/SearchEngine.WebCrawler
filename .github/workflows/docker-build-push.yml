@@ -26,9 +26,8 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
       
-      # Run tests
-      - name: Run tests
-        run: dotnet test --configuration Release --no-build --verbosity normal
+      - name: .Net Unit Test
+        uses: RachelGanonNew/Run-All-.Net-Unit-Test@v1.2.1
       
       # Log in to Docker Hub (only for tags)
       - name: Log in to Docker Hub
